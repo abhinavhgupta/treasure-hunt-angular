@@ -1,0 +1,94 @@
+<form [formGroup]="formGroup" class="container row">
+  <div class="col-md-4">
+    <label class="form-label">Row</label>
+    <input class="form-control" formControlName="rowNumber">
+    <div class="invalid-feedback error">
+      <div
+        *ngIf="formGroup.controls.rowNumber.invalid && (formGroup.controls.rowNumber.dirty ||formGroup.controls.rowNumber.touched)">
+        <div *ngIf="formGroup.controls.rowNumber.errors?.required">
+          Required.
+        </div>
+        <div *ngIf="formGroup.controls.rowNumber.errors?.minlength || formGroup.controls.rowNumber.errors?.maxlength">
+          Must be at least 1 characters long.
+        </div>
+        <div *ngIf="formGroup.controls.rowNumber.errors?.pattern">
+          Must be digit
+        </div>
+        <div *ngIf="formGroup.controls.rowNumber.errors?.min">
+          Minumum value 5
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">
+      Columns
+    </label>
+    <input class="form-control" formControlName="columnNumber">
+    <div class="invalid-feedback error">
+      <div
+        *ngIf="formGroup.controls.columnNumber.invalid && (formGroup.controls.columnNumber.dirty ||formGroup.controls.columnNumber.touched)">
+        <div *ngIf="formGroup.controls.columnNumber.errors?.required">
+          Required.
+        </div>
+        <div
+          *ngIf="formGroup.controls.columnNumber.errors?.minlength || formGroup.controls.columnNumber.errors?.maxlength">
+          Must be at least 1 characters long.
+        </div>
+        <div *ngIf="formGroup.controls.columnNumber.errors?.pattern">
+          Must be digit
+        </div>
+        <div *ngIf="formGroup.controls.columnNumber.errors?.min">
+          Minumum value 5
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="showGridButton">&nbsp;</div>
+  <div class="container" formArrayName="table">
+    <div *ngFor="let row of getTableFormArray().controls; let index = index">
+      <div [formGroupName]="index">
+        <div class="row row-cols-auto" formArrayName="row">
+          <div *ngFor="let col of getRowArray(index).controls; let i = index">
+            <div class="row row-cols-auto" [formGroupName]="i">
+              <div>
+                <input formControlName="column">
+                <div *ngIf="validateTable(index, i)" class="invalid-feedback error">
+                  allowed between {{min}} & {{max}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="row">&nbsp;</div>
+  <div class="col-12">
+    <button class="btn btn-primary m-1" *ngIf="!showGridButton" [disabled]="formGroup.invalid" type="submit"
+      (click)="generateTable()">Generate</button>
+    <button *ngIf="showGridButton" [disabled]="formGroup.invalid" class="btn btn-primary  m-1" type="submit"
+      (click)="findTreasure()">Find</button>
+    <button class="btn btn-primary m-1" *ngIf="showGridButton" type="submit" (click)="reset()">Reset</button>
+  </div>
+
+  <div *ngIf="treasueHuntResponse">
+    <div *ngIf="treasueHuntResponse.rows.length>0; else errorBlock">
+      Treasaure path is
+      <div *ngFor="let row of treasueHuntResponse.rows; let last = last" style="display: flex;">
+        Row {{row[0]}} column {{row[1]}},
+        <div *ngIf="!last" style="margin-left: 5px;">
+          then go to
+        </div>
+        <div *ngIf="last" style="margin-left: 5px;">
+          Treasaure found at row {{row[0]}} column {{row[1]}}
+        </div>
+      </div>
+    </div>
+    <ng-template #errorBlock>
+      Data in table is not correct
+    </ng-template>
+  </div>
+
+</form>
